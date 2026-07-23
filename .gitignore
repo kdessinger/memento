@@ -30,8 +30,7 @@ pnpm-debug.log*
 #Playwright
 .playwright*
 
-# Documentation files that shouldn't be committed
-AGENTS.md
+# Local assistant scratch files that shouldn't be committed
 CLAUDE.md
 
 # Development artifacts that shouldn't be committed
@@ -41,6 +40,3 @@ CHANGELOG.md
 
 # Test reports and analysis
 /test-reports/
-
-#Internal docs
-/docs/
