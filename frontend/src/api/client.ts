@@ -150,6 +150,34 @@ export interface MemorableExchange {
   updatedAt: string;
 }
 
+export interface ChatMessage {
+  id: number;
+  sessionId: number;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatSession {
+  id: number;
+  userId: number;
+  hermesSessionId?: string | null;
+  title?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatApiResponse {
+  success: boolean;
+  data: ChatResponse;
+}
+
+export interface ChatResponse {
+  sessionId: number;
+  reply: string;
+  hermesSessionId?: string;
+}
+
 export interface SectionDiscovery {
   id: number;
   sectionHeader: string;
@@ -378,11 +406,27 @@ export const lifeLogsApi = {
   delete: (id: number) => api.delete(`/lifelogs/${id}`),
 };
 
+interface SyncAllResult {
+  success: boolean;
+  message: string;
+  insights?: {
+    details?: {
+      new_insights?: number;
+      updated_insights?: number;
+    };
+  };
+  lifelogs?: {
+    synced?: number;
+    updated?: number;
+    skipped?: number;
+  };
+}
+
 export const syncApi = {
   getStatus: () => api.get<SyncStatus>('/sync/status'),
   runSync: (force = false) => api.post<SyncResult>('/sync/run', {}, { params: { force } }),
   syncAll: (params?: { force?: boolean; days_back?: number; incremental?: boolean }) =>
-    api.post<{success: boolean; message: string; insights: unknown; lifelogs: unknown}>('/sync/all', {}, { params }),
+    api.post<SyncAllResult>('/sync/all', {}, { params }),
 };
 
 export const speakersApi = {
@@ -393,6 +437,27 @@ export const speakersApi = {
     api.put<{ data: SpeakerProfile }>(`/speakers/${encodeURIComponent(speakerName)}`, data),
   delete: (speakerName: string) => api.delete(`/speakers/${encodeURIComponent(speakerName)}`),
   autoDiscover: () => api.post<{ data: AutoDiscoverResult; message: string }>('/speakers/auto-discover'),
+};
+
+export const chatApi = {
+  sendMessage: (message: string, sessionId?: number) =>
+    api.post<{ success: boolean; data: ChatResponse }>('/chat', { message, sessionId }),
+  getSessions: () => api.get<{ data: ChatSession[] }>('/chat/sessions'),
+  getMessages: (sessionId: number) =>
+    api.get<{ data: ChatMessage[] }>(`/chat/sessions/${sessionId}/messages`),
+};
+
+export interface ObsidianExportResult {
+  success: boolean;
+  message: string;
+  insightsExported: number;
+  lifelogsExported: number;
+  errors: string[];
+}
+
+export const obsidianApi = {
+  export: (params?: { force?: boolean; sinceDate?: string; includeLifelogs?: boolean }) =>
+    api.post<ObsidianExportResult>('/obsidian/export', params || {}),
 };
 
 export const discoveryApi = {

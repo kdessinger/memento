@@ -224,3 +224,20 @@ export const memorableExchanges = sqliteTable('memorable_exchanges', {
   createdAt: text('created_at').notNull().default(sql`datetime('now')`),
   updatedAt: text('updated_at').notNull().default(sql`datetime('now')`)
 });
+
+export const chatSessions = sqliteTable('chat_sessions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  hermesSessionId: text('hermes_session_id'),
+  title: text('title'),
+  createdAt: text('created_at').notNull().default(sql`datetime('now')`),
+  updatedAt: text('updated_at').notNull().default(sql`datetime('now')`)
+});
+
+export const chatMessages = sqliteTable('chat_messages', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  sessionId: integer('session_id').notNull().references(() => chatSessions.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(), // 'user' | 'assistant' | 'system'
+  content: text('content').notNull(),
+  createdAt: text('created_at').notNull().default(sql`datetime('now')`)
+});

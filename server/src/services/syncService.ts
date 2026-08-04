@@ -7,6 +7,7 @@ import { createLifeLog, updateLifeLog } from './dataService.js';
 import { getUserConfig } from './authService.js';
 import { extractStructuredData } from '../utils/structuredData.js';
 import { processApprovedSections, checkForNewDiscoveries } from './discoveryService.js';
+import { normalizeLifeLog as normalizeLifeLogWithTimezone } from './lifelogNormalizer.js';
 
 const LIMITLESS_BASE_URL = 'https://api.limitless.ai/v1';
 
@@ -379,7 +380,7 @@ export async function syncLifeLogsForUser(
     for (const entry of lifelogEntries) {
         // Extract date from the entry itself or use current date
         const entryDate = entry.date || DateTime.now().toISODate() || '';
-        const normalized = normalizeLifeLog(entry, entryDate);
+        const normalized = normalizeLifeLogWithTimezone(entry, entryDate, timezone);
         if (!normalized) {
           continue;
         }

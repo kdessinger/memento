@@ -13,7 +13,7 @@ import { TagManager } from './components/TagManager';
 import { ChatPanel } from './components/ChatPanel';
 import { DiscoveryNotification } from './components/DiscoveryNotification';
 import { DatabaseView } from './components/DatabaseView';
-import { generalApi, discoveryApi, type DashboardStats } from './api/client';
+import { generalApi, type DashboardStats } from './api/client';
 import './App.css';
 
 type ViewMode = 'daily' | 'all_insights';

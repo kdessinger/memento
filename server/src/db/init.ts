@@ -219,6 +219,19 @@ export function runMigrations(db: Database.Database) {
     `);
   }
 
+  // Keep a single durable sync state per user. Older versions inserted a row on
+  // every sync because user_id was not unique, so consolidate before adding the
+  // constraint. The highest id is the newest record under SQLite's autoincrement.
+  db.exec(`
+    DELETE FROM sync_metadata
+    WHERE id NOT IN (
+      SELECT MAX(id)
+      FROM sync_metadata
+      GROUP BY user_id
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_sync_metadata_user ON sync_metadata(user_id);
+  `);
+
   // Create speaker_profiles table if it doesn't exist
   db.exec(`
     CREATE TABLE IF NOT EXISTS speaker_profiles (
@@ -290,6 +303,27 @@ export function runMigrations(db: Database.Database) {
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY(insight_id) REFERENCES insights(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS chat_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      hermes_session_id TEXT,
+      title TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_chat_sessions_user ON chat_sessions(user_id);
+
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id INTEGER NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages(session_id);
   `);
 }
 

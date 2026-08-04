@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, like, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, like, sql, type SQL } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import {
   insights,
@@ -56,7 +56,7 @@ export async function listInsights(userId: number, { skip = 0, limit = 100 }: { 
     tagMap.set(row.action_item_tags.actionItemId, list);
   }
 
-  const actionMap = new Map<number, typeof actionRows>();
+  const actionMap = new Map<number, any[]>();
   for (const item of actionRows) {
     if (!item.insightId) continue;
     const list = actionMap.get(item.insightId) ?? [];
@@ -252,14 +252,14 @@ export async function listActionItems(userId: number, {
   source?: string;
   tagIds?: number[];
 } = {}) {
-  let condition = eq(actionItems.userId, userId);
+  let condition: SQL = eq(actionItems.userId, userId);
 
   if (typeof completed === 'boolean') {
-    condition = and(condition, eq(actionItems.completed, completed));
+    condition = and(condition, eq(actionItems.completed, completed))!;
   }
 
   if (source) {
-    condition = and(condition, eq(actionItems.source, source));
+    condition = and(condition, eq(actionItems.source, source))!;
   }
 
   let results = await db
@@ -422,9 +422,9 @@ export async function updateIdea(userId: number, id: number, data: { content?: s
 }
 
 export async function listQuestions(userId: number, { skip = 0, limit = 100, resolved }: { skip?: number; limit?: number; resolved?: boolean } = {}) {
-  let condition = eq(questions.userId, userId);
+  let condition: SQL = eq(questions.userId, userId);
   if (typeof resolved === 'boolean') {
-    condition = and(condition, eq(questions.resolved, resolved));
+    condition = and(condition, eq(questions.resolved, resolved))!;
   }
   const rows = await db
     .select()
@@ -607,8 +607,8 @@ export async function getDashboardStats(userId: number) {
   const [totalInsights] = await db.select({ count: count() }).from(insights).where(eq(insights.userId, userId));
   
   // Use raw SQL for action items count due to issue with drizzle count() function
-  const [rawTotalActionItems] = await db.all(sql`SELECT COUNT(*) as count FROM action_items WHERE user_id = ${userId}`);
-  const [rawCompletedActionItems] = await db.all(sql`SELECT COUNT(*) as count FROM action_items WHERE user_id = ${userId} AND completed = 1`);
+  const [rawTotalActionItems] = await db.all(sql`SELECT COUNT(*) as count FROM action_items WHERE user_id = ${userId}`) as { count: number }[];
+  const [rawCompletedActionItems] = await db.all(sql`SELECT COUNT(*) as count FROM action_items WHERE user_id = ${userId} AND completed = 1`) as { count: number }[];
   
   const totalActionItems = { count: rawTotalActionItems.count };
   const completedActionItems = { count: rawCompletedActionItems.count };
@@ -635,17 +635,17 @@ export async function getDashboardStats(userId: number) {
     total_insights: totalInsights.count ?? 0,
     total_action_items: totalActionItems.count ?? 0,
     completed_action_items: completedActionItems.count ?? 0,
-    total_decisions: tableCounts[0].count ?? 0,
-    total_ideas: tableCounts[1].count ?? 0,
-    total_questions: tableCounts[2].count ?? 0,
-    resolved_questions: tableCounts[3].count ?? 0,
-    total_themes: tableCounts[4].count ?? 0,
-    total_quotes: tableCounts[5].count ?? 0,
-    total_highlights: tableCounts[6].count ?? 0,
-    total_lifelogs: tableCounts[7].count ?? 0,
-    total_knowledge_nuggets: tableCounts[8].count ?? 0,
-    total_memorable_exchanges: tableCounts[9].count ?? 0,
-    pending_discoveries: tableCounts[10].count ?? 0
+    total_decisions: tableCounts[0][0]?.count ?? 0,
+    total_ideas: tableCounts[1][0]?.count ?? 0,
+    total_questions: tableCounts[2][0]?.count ?? 0,
+    resolved_questions: tableCounts[3][0]?.count ?? 0,
+    total_themes: tableCounts[4][0]?.count ?? 0,
+    total_quotes: tableCounts[5][0]?.count ?? 0,
+    total_highlights: tableCounts[6][0]?.count ?? 0,
+    total_lifelogs: tableCounts[7][0]?.count ?? 0,
+    total_knowledge_nuggets: tableCounts[8][0]?.count ?? 0,
+    total_memorable_exchanges: tableCounts[9][0]?.count ?? 0,
+    pending_discoveries: tableCounts[10][0]?.count ?? 0
   };
 }
 
@@ -708,9 +708,9 @@ export async function searchData(userId: number, query: string, limit = 100) {
 }
 
 export async function listLifeLogs(userId: number, { skip = 0, limit = 100, date }: { skip?: number; limit?: number; date?: string } = {}) {
-  let condition = eq(lifelogs.userId, userId);
+  let condition: SQL = eq(lifelogs.userId, userId);
   if (date) {
-    condition = and(condition, eq(lifelogs.date, date));
+    condition = and(condition, eq(lifelogs.date, date))!;
   }
 
   const result = await db

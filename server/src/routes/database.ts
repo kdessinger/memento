@@ -48,11 +48,11 @@ router.get('/tables', async (req, res) => {
 
     const tables: TableInfo[] = [];
 
-    for (const table of tablesResult) {
+    for (const table of tablesResult as { name: string }[]) {
       const tableName = table.name;
 
       // Get row count
-      const countResult = await db.get(sql.raw(`SELECT COUNT(*) as count FROM "${tableName}"`));
+      const countResult = await db.get(sql.raw(`SELECT COUNT(*) as count FROM "${tableName}"`)) as { count: number } | undefined;
       const rowCount = countResult?.count || 0;
 
       // Get column information
@@ -98,7 +98,7 @@ router.get('/tables/:tableName', async (req, res) => {
     }
 
     // Get total row count
-    const countResult = await db.get(sql.raw(`SELECT COUNT(*) as count FROM "${tableName}"`));
+    const countResult = await db.get(sql.raw(`SELECT COUNT(*) as count FROM "${tableName}"`)) as { count: number } | undefined;
     const totalRows = countResult?.count || 0;
 
     // Get column information

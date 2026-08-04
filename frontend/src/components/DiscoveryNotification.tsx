@@ -16,7 +16,7 @@ export function DiscoveryNotification({ onDiscoveryApproved }: DiscoveryNotifica
     try {
       const response = await discoveryApi.getPendingDiscoveries();
       // Handle both direct array and data wrapper
-      const discoveryData = Array.isArray(response.data) ? response.data : response.data?.data || [];
+      const discoveryData = Array.isArray(response.data) ? response.data : [];
       setDiscoveries(discoveryData);
       setIsVisible(discoveryData.length > 0);
     } catch (error) {

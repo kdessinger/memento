@@ -16,6 +16,9 @@ import speakersRouter from './routes/speakers.js';
 import discoveryRouter from './routes/discovery.js';
 import databaseRouter from './routes/database.js';
 
+import chatRouter from './routes/chat.js';
+import obsidianRouter from './routes/obsidian.js';
+
 const app = express();
 
 app.use(cors({
@@ -39,6 +42,8 @@ app.use('/api/sync', syncRouter);
 app.use('/api/speakers', speakersRouter);
 app.use('/api/discovery', discoveryRouter);
 app.use('/api/database', databaseRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/obsidian', obsidianRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

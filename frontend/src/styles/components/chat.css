@@ -23,6 +23,38 @@
   border-radius: 20px 0 0 0;
 }
 
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chat-new-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: rgba(6, 182, 212, 0.9);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.chat-new-button:hover {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: rgba(6, 182, 212, 0.5);
+  color: #22d3ee;
+}
+
+.new-chat-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .chat-title h3 {
   color: #e5e5e7;
   font-size: 1.1rem;
@@ -178,4 +210,58 @@
   color: rgba(229, 229, 231, 0.5);
   margin-top: 0.5rem;
   text-align: center;
+}
+
+/* Loading and error states */
+.loading-message .message-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.chat-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 0.75rem;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  align-self: flex-start;
+}
+
+.chat-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: rgba(229, 229, 231, 0.6);
+  text-align: center;
+}
+
+.chat-empty-state p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e5e5e7;
+}
+
+.chat-empty-hint {
+  font-size: 0.85rem;
+  max-width: 250px;
+  line-height: 1.4;
 }

@@ -126,7 +126,7 @@ export const DatabaseView: React.FC = () => {
     }
   };
 
-  const formatCellValue = (value: any, columnType: string) => {
+  const formatCellValue = (value: any, _columnType: string) => {
     if (value === null || value === undefined) {
       return <span className="null-value">NULL</span>;
     }

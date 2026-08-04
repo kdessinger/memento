@@ -24,7 +24,8 @@ type SectionType =
   | 'themes'
   | 'quotes'
   | 'knowledge_nuggets'
-  | 'memorable_exchanges';
+  | 'memorable_exchanges'
+  | 'database';
 
 interface ConsolidatedSidebarProps {
   stats: DashboardStats | null;

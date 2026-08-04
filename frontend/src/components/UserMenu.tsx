@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HiLogout, HiRefresh, HiClock, HiLightningBolt, HiUsers, HiDatabase } from 'react-icons/hi';
+import { HiLogout, HiRefresh, HiClock, HiLightningBolt, HiUsers, HiDatabase, HiBookOpen } from 'react-icons/hi';
 import { useAuth } from '../contexts/AuthContext';
-import { syncApi } from '../api/client';
+import { syncApi, obsidianApi } from '../api/client';
 import { TimezoneSettings } from './TimezoneSettings';
 import { SpeakerManager } from './SpeakerManager';
 import { ReprocessPanel } from './ReprocessPanel';
@@ -25,6 +25,8 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
   const [showTimezoneSettings, setShowTimezoneSettings] = useState(false);
   const [showSpeakerManager, setShowSpeakerManager] = useState(false);
   const [showReprocessPanel, setShowReprocessPanel] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<{ success: boolean; message: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout, config } = useAuth();
 
@@ -60,6 +62,20 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
       setSyncResult({ success: false, message: errorMessage });
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const runObsidianExport = async () => {
+    try {
+      setIsExporting(true);
+      setExportResult(null);
+      const response = await obsidianApi.export();
+      setExportResult({ success: response.data.success, message: response.data.message });
+    } catch (err: any) {
+      console.error('Obsidian export error:', err);
+      setExportResult({ success: false, message: err.response?.data?.message || 'Export failed' });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -157,6 +173,25 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
                 <div className="menu-item-description">Re-extract structured data</div>
               </div>
             </button>
+
+            <button
+              className="menu-item"
+              onClick={() => { runObsidianExport(); }}
+              disabled={isExporting}
+            >
+              <HiBookOpen className="menu-icon" />
+              <div className="menu-item-content">
+                <div className="menu-item-title">Export to Obsidian</div>
+                <div className="menu-item-description">Sync insights to second-brain vault</div>
+              </div>
+              {isExporting && <div className="sync-spinner"></div>}
+            </button>
+
+            {exportResult && (
+              <div className={`sync-result ${exportResult.success ? 'success' : 'error'}`}>
+                {exportResult.message}
+              </div>
+            )}
           </div>
 
           <div className="menu-divider"></div>

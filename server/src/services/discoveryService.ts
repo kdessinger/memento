@@ -181,7 +181,7 @@ export async function discoverNewSections(userId?: number): Promise<DiscoveredSe
       // Extract section content
       const sectionStart = insight.content.indexOf(fullHeader);
       const nextSectionMatch = insight.content.slice(sectionStart + fullHeader.length).match(/\n##\s+[A-Z]/);
-      const sectionEnd = nextSectionMatch
+      const sectionEnd = nextSectionMatch && nextSectionMatch.index !== undefined
         ? sectionStart + fullHeader.length + nextSectionMatch.index
         : insight.content.length;
 
@@ -301,7 +301,7 @@ export async function processApprovedSections(userId: number, insightId: number,
     .where(eq(sectionDiscoveries.status, 'approved'));
 
   for (const section of approvedSections) {
-    const rules = JSON.parse(section.extractionRules || '{}');
+    const rules = typeof section.extractionRules === 'string' ? JSON.parse(section.extractionRules) : ((section.extractionRules as any) || {});
 
     if (rules.type === 'knowledge_nuggets') {
       const extracted = extractKnowledgeNuggets(content, date);
