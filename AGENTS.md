@@ -32,9 +32,9 @@ ssh mars 'pvesh get /nodes/neptune/qemu/113/agent/exec-status --pid <pid> --outp
 ## Rules for agents
 
 - Do not commit secrets, Limitless API keys, cookies, exported lifelog/audio content, or raw database dumps.
-- Treat lifelogs and recordings as private user data. Query content only when Kenn explicitly asks.
+- Treat lifelogs and recordings as private user data. Kenn has standing permission for Hermes/Memento voice-command and continuity workflows to read full transcript content when a wake command anchors the relevant lifelog; do not expose unrelated raw transcript content in logs, commits, or replies.
 - Prefer app/API access over raw SQLite reads when practical.
-- Do not replace the live container until changes have been tested locally and Kenn approves deployment.
+- Kenn grants standing permission to deploy/restart the single-user Memento app after local verification; temporary downtime is acceptable. Back up the SQLite DB and verify the replacement container/API after every deployment.
 - Preserve upstream attribution. Salman wrote the original app; this is Kenn's maintained local continuation.
 - For new code, favor small commits and keep `npm run build` moving toward green.
 

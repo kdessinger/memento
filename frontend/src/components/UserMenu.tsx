@@ -5,6 +5,7 @@ import { syncApi, obsidianApi } from '../api/client';
 import { TimezoneSettings } from './TimezoneSettings';
 import { SpeakerManager } from './SpeakerManager';
 import { ReprocessPanel } from './ReprocessPanel';
+import { WakeBridgeSettings } from './WakeBridgeSettings';
 
 interface UserMenuProps {
   onSyncComplete?: (syncResults?: any) => void;
@@ -25,6 +26,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
   const [showTimezoneSettings, setShowTimezoneSettings] = useState(false);
   const [showSpeakerManager, setShowSpeakerManager] = useState(false);
   const [showReprocessPanel, setShowReprocessPanel] = useState(false);
+  const [showWakeBridgeSettings, setShowWakeBridgeSettings] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<{ success: boolean; message: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
         setIsOpen(false);
         setShowTimezoneSettings(false);
         setShowSpeakerManager(false);
+        setShowWakeBridgeSettings(false);
       }
     };
 
@@ -174,6 +177,22 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
               </div>
             </button>
 
+            {user.isAdmin && (
+              <button
+                className="menu-item"
+                onClick={() => {
+                  setShowWakeBridgeSettings(true);
+                  setIsOpen(false);
+                }}
+              >
+                <HiLightningBolt className="menu-icon" />
+                <div className="menu-item-content">
+                  <div className="menu-item-title">Pendant Command Bridge</div>
+                  <div className="menu-item-description">Polling cadence and transcript pull limit</div>
+                </div>
+              </button>
+            )}
+
             <button
               className="menu-item"
               onClick={() => { runObsidianExport(); }}
@@ -268,6 +287,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onSyncComplete, onNavigateTo
 
       {showReprocessPanel && (
         <ReprocessPanel onClose={() => setShowReprocessPanel(false)} />
+      )}
+      {showWakeBridgeSettings && (
+        <WakeBridgeSettings onClose={() => setShowWakeBridgeSettings(false)} />
       )}
     </div>
   );

@@ -59,7 +59,8 @@ Observed on 2026-07-23:
    - `SyncDebugPanel.tsx` reads fields from `{}` without typing
 3. Server TypeScript also had errors during earlier inspection, mostly in `dataService.ts` and `discoveryService.ts`.
 4. There is no first-party Dockerfile/Compose in upstream.
-5. The current live Docker image uses `npm install` and `npm run dev`, not a proper production build.
+5. Earlier live deployments used `npm run dev`; the current `memento:dual-signal-20260904-r1` container runs the built server entry point, but broader reproducible-build cleanup remains an active priority.
+6. **Dual-signal pendant command gate:** Limitless omits `contents` when a list request exceeds 25 records, so the bridge caps pulls at 25 and exposes an admin-only **Pendant Command Bridge** settings panel for pause/resume, 1–15 minute cadence, and a 1–25 lifelog pull limit. Commands require both a lifelog marked `isStarred: true` by the pendant's physical button and a direct `Hey Hermes`/`Hermes` address. An unstarred wake phrase remains ambient memory; a button-only star produces no command. The signed webhook includes `lifelog_id`, `captured_at`, and `starred_lifelog: true`; Hermes treats the first two as the authoritative retrieval anchor. The verified live deployment is `memento:dual-signal-20260904-r1` (2026-09-04), with persisted defaults enabled, 1-minute cadence, and 25 lifelogs per pull.
 
 ## Privacy posture
 

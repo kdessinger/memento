@@ -40,3 +40,6 @@ CHANGELOG.md
 
 # Test reports and analysis
 /test-reports/
+
+# Deployment artifacts (large tarballs of built bundles)
+/.deploy/

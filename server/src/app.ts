@@ -15,6 +15,7 @@ import syncRouter from './routes/sync.js';
 import speakersRouter from './routes/speakers.js';
 import discoveryRouter from './routes/discovery.js';
 import databaseRouter from './routes/database.js';
+import wakeBridgeRouter from './routes/wakeBridge.js';
 
 import chatRouter from './routes/chat.js';
 import obsidianRouter from './routes/obsidian.js';
@@ -34,6 +35,7 @@ app.use('/api/config', configRouter);
 app.use('/api/system', systemRouter);
 app.use('/api/insights', insightsRouter);
 app.use('/api/action-items', actionItemsRouter);
+app.use('/api/wake-bridge', wakeBridgeRouter);
 app.use('/api', contentRouter);
 app.use('/api/tags', tagsRouter);
 app.use('/api/lifelogs', lifelogsRouter);

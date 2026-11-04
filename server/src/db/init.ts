@@ -232,6 +232,35 @@ export function runMigrations(db: Database.Database) {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_sync_metadata_user ON sync_metadata(user_id);
   `);
 
+  // Wake-command bridge state is deliberately metadata-only: plaintext voice
+  // commands are never persisted in SQLite.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS voice_command_bridge_state (
+      user_id INTEGER PRIMARY KEY,
+      initialized_at TEXT NOT NULL,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS voice_command_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      command_id TEXT NOT NULL,
+      audit_hash TEXT NOT NULL,
+      lifelog_id TEXT NOT NULL,
+      captured_at TEXT,
+      status TEXT NOT NULL CHECK (status IN ('detected', 'dispatched', 'failed', 'ignored_initial_history')),
+      attempts INTEGER NOT NULL DEFAULT 0,
+      error_message TEXT,
+      dispatched_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE(user_id, command_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_voice_command_events_status
+      ON voice_command_events(user_id, status, created_at);
+  `);
+
   // Create speaker_profiles table if it doesn't exist
   db.exec(`
     CREATE TABLE IF NOT EXISTS speaker_profiles (

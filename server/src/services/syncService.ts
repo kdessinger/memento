@@ -8,6 +8,7 @@ import { getUserConfig } from './authService.js';
 import { extractStructuredData } from '../utils/structuredData.js';
 import { processApprovedSections, checkForNewDiscoveries } from './discoveryService.js';
 import { normalizeLifeLog as normalizeLifeLogWithTimezone } from './lifelogNormalizer.js';
+import type { LimitlessContentNode } from './commandBridgeService.js';
 
 const LIMITLESS_BASE_URL = 'https://api.limitless.ai/v1';
 
@@ -23,16 +24,26 @@ interface LimitlessChat {
   messages?: LimitlessMessage[];
 }
 
-interface LimitlessLifeLog {
+export interface LimitlessLifeLog {
   id: string;
   startTime?: string;
   endTime?: string;
   title?: string;
   summary?: string;
-  contents?: unknown[];
+  isStarred?: boolean;
+  contents?: LimitlessContentNode[];
   markdown?: string;
   segmentType?: string;
   date?: string;
+}
+
+interface FetchLifeLogOptions {
+  date?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+  timezone?: string;
+  includeContents?: boolean;
 }
 
 async function fetchDailyInsights(apiKey: string, options: { start?: string; limit?: number } = {}): Promise<LimitlessChat[]> {
@@ -52,9 +63,10 @@ async function fetchDailyInsights(apiKey: string, options: { start?: string; lim
   return chats.filter((chat: LimitlessChat) => chat.summary === 'Daily insights');
 }
 
-async function fetchLifeLogs(apiKey: string, options: { date?: string; start?: string; end?: string; limit?: number } = {}): Promise<LimitlessLifeLog[]> {
-  const { date, start, end, limit = 100 } = options;
-  const params: any = { limit };
+export async function fetchLifeLogs(apiKey: string, options: FetchLifeLogOptions = {}): Promise<LimitlessLifeLog[]> {
+  const { date, start, end, limit = 100, timezone, includeContents = true } = options;
+  const params: Record<string, string | number | boolean> = { limit, includeContents };
+  if (timezone) params.timezone = timezone;
   
   if (date) {
     params.date = date;

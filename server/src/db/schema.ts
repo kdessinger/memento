@@ -164,6 +164,26 @@ export const syncMetadata = sqliteTable('sync_metadata', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`)
 });
 
+export const voiceCommandBridgeState = sqliteTable('voice_command_bridge_state', {
+  userId: integer('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  initializedAt: text('initialized_at').notNull()
+});
+
+export const voiceCommandEvents = sqliteTable('voice_command_events', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  commandId: text('command_id').notNull(),
+  auditHash: text('audit_hash').notNull(),
+  lifelogId: text('lifelog_id').notNull(),
+  capturedAt: text('captured_at'),
+  status: text('status').notNull(),
+  attempts: integer('attempts').notNull().default(0),
+  errorMessage: text('error_message'),
+  dispatchedAt: text('dispatched_at'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`)
+});
+
 export const speakerProfiles = sqliteTable('speaker_profiles', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
